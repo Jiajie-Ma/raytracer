@@ -107,3 +107,10 @@ inline bool near_zero(const glm::vec3& e)
    return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
 }
 
+// test for a float close to zero
+inline bool near_zero(float x)
+{
+   const auto s = 1e-8;
+   return fabs(x) < s;
+}
+
