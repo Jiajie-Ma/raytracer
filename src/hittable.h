@@ -21,6 +21,19 @@ struct hit_record {
       normal = front_face ? outward_normal :-outward_normal;
    }
 
+   inline void set_line_face_normal(const ray& r, const glm::vec3& outward_normal, const glm::vec3& n, const glm::vec3& l) {
+      front_face = glm::dot(r.direction(), outward_normal) < 0;
+      if (near_zero(glm::cross(l,n))){
+         normal = front_face ? outward_normal :-outward_normal;
+      }
+      else{
+         normal = normalize(glm::cross(l, n));
+         if (glm::dot(r.direction(), normal) > 0){
+            normal = -normal;
+         }
+      }
+   }
+
    inline std::string str() const {
       std::ostringstream ss;
       ss << "position: " << p << std::endl;

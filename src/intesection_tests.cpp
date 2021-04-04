@@ -98,12 +98,12 @@ int main(int argc, char** argv)
    test_sphere(s, 
                ray(point3(0, 0, 3), vec3(0, 0, -1)), // ray outside/towards sphere
                true, 
-               hit_record{vec3(0,0,2), vec3(0,0,1), 1, true, empty}); 
+               hit_record{vec3(0,0,2), vec3(0,0,1), 1.0, true, empty}); 
 
    test_sphere(s, 
                ray(point3(0, 0, 0), vec3(0, 0, -1)), // ray inside sphere
                true, 
-               hit_record{ vec3(0,0,-2), vec3(0,0,1), 2, false, empty}); 
+               hit_record{ vec3(0,0,-2), vec3(0,0,1), 2.0, false, empty}); 
 
    test_sphere(s, 
                ray(point3(0, 0, 3), vec3(0, 0, 1)), // ray outside/away sphere
@@ -127,7 +127,7 @@ int main(int argc, char** argv)
    test_plane(p, 
                ray(point3(0, 2, 3), vec3(0, -2, 0)), // ray outside/towards sphere
                true, 
-               hit_record{vec3(0,0,3), vec3(0,1,0), 1, true, empty}); 
+               hit_record{vec3(0,0,3), vec3(0,1,0), 1.0, true, empty}); 
 
    test_plane(p, 
                ray(point3(2, 0, 3), vec3(0, 6, 0)), // the origin of the ray is inside the sphere
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
    test_plane(p, 
                ray(point3(6, -8, 4), vec3(0, 2, 0)), // ray outside/towards sphere from the other hyperplane
                true, 
-               hit_record{ vec3(6,0,4), vec3(0,-1,0), 4, false, empty}); 
+               hit_record{ vec3(6,0,4), vec3(0,-1,0), 4.0, false, empty}); 
 
    test_plane(p, 
                ray(point3(6, 0, 6), vec3(2, 0, 9)), // ray entirely inside the plane
@@ -155,4 +155,168 @@ int main(int argc, char** argv)
                none); 
    
    // triangle intersection tests (the direction of the normal follows the right-hand rule).
+   triangle T(point3(0,1,0), point3(0,0,1), point3(0,0,-1), empty);
+
+   test_triangle(T,
+                  ray(point3(0,1,0), vec3(2,4,6)), // the origin of the ray is on a vertex
+                  true,
+                  hit_record{ vec3(0,1,0), vec3(-1,0,0), 0, true, empty});
+
+   test_triangle(T,
+                  ray(point3(0,0.5,-0.5), vec3(-6,7,8)), // the origin of the ray is on an edge
+                  true,
+                  hit_record{ vec3(0,0.5,-0.5), vec3(1,0,0), 0, false, empty});
+
+   test_triangle(T,
+                  ray(point3(0,0.5,0), vec3(-6,7,8)), // the origin of the ray is inside the interior
+                  true,
+                  hit_record{ vec3(0,0.5,0), vec3(1,0,0), 0, false, empty});
+
+   test_triangle(T,
+                  ray(point3(0,2,0), vec3(-6,7,8)), // the origin of the ray is in the supporting plane but misses the triangle
+                  false,
+                  none);
+
+   test_triangle(T,
+                  ray(point3(0,0.5,0), vec3(0,7,8)), // the ray is entirely in the supporting plane and the origin is inside the interior
+                  true,
+                  hit_record{ vec3(0,0.5,0), vec3(1,0,0), 0, false, empty});
+
+   test_triangle(T,
+                  ray(point3(0,0.5,-0.5), vec3(0,-6,-6)), // the ray is entirely in the supporting plane and the origin is on an edge
+                  true,
+                  hit_record{ vec3(0,0.5,-0.5), vec3(1,0,0), 0, false, empty});
+
+   test_triangle(T,
+                  ray(point3(0,2,0), vec3(0,3,0)), // the ray is entirely in the supporting plane and the origin is outside the triangle. It misses the trianlge
+                  false,
+                  none);
+
+   test_triangle(T,
+                  ray(point3(0,6,0), vec3(0,1,100)), // the ray is entirely in the supporting plane and the origin is outside the triangle. It misses the trianlge
+                  false,
+                  none);
+
+   test_triangle(T,
+                  ray(point3(0,0,2), vec3(0,0,-0.5)), // the ray is entirely in the supporting plane and the origin is outside the triangle. It hits the triangle
+                  true,
+                  hit_record{ vec3(0,0,1), vec3(1,0,0), 2.0, false, empty});
+
+   test_triangle(T,
+                  ray(point3(0,1,1), vec3(0,-1,-1)), // the ray is entirely in the supporting plane and the origin is outside the triangle. It hits the trianlge
+                  true,
+                  hit_record{ vec3(0,0.5,0.5), vec3(1,0,0), 0.5f, false, empty});
+
+   test_triangle(T,
+                  ray(point3(2,1,1), vec3(1,1,1)), // the ray is outside the support plane and it points away from the triangle
+                  false,
+                  none);
+
+   test_triangle(T,
+                  ray(point3(6,0.5,0.5), vec3(-1,0,0)), // the ray is outside the support plane and it hits the triangle
+                  true,
+                  hit_record{ vec3(0,0.5,0.5), vec3(1,0,0), 6.0, false, empty});
+
+   test_triangle(T,
+                  ray(point3(-2,1,0), vec3(2,-0.5,0)), // the ray is outside the support plane and it hits the triangle
+                  true,
+                  hit_record{ vec3(0,0.5,0), vec3(-1,0,0), 1.0, true, empty});
+
+   test_triangle(T,
+                  ray(point3(2,1,1), vec3(-6,0,0)), // the ray is outside the support plane. It point towards the triangle but misses
+                  false,
+                  none);
+
+   test_triangle(T,
+                  ray(point3(-2,1,0), vec3(6,10,0)), // the ray is outside the support plane. It point towards the triangle but misses
+                  false,
+                  none);
+
+   // line intersection tests
+   line l(point3(0), point3(1,0,0), empty);
+   line l2(point3(0,1,-1), point3(3,1,-1), empty);
+
+   test_line(l, 
+               ray(point3(0), vec3(1,0,1)), // the origin of the ray is on the line
+               true,
+               hit_record{ vec3(0,0,0), vec3(0,0,-1), 0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(0.5,0,0), vec3(0,6,0)), // the origin of the ray is on the line
+               true,
+               hit_record{ vec3(0.5,0,0), vec3(0,-1,0), 0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(0.5,0,0), vec3(6.6,0,0)), // the ray is colinear with the line and it hits the line
+               true,
+               hit_record{ vec3(0.5,0,0), vec3(0,0,-1), 0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(0,0,0), vec3(-6.6,0,0)), // the ray is colinear with the line and it hits the line
+               true,
+               hit_record{ vec3(0,0,0), vec3(0,0,-1), 0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(-1,0,0), vec3(0.5,0,0)), // the ray is colinear with the line and it hits the line
+               true,
+               hit_record{ vec3(0,0,0), vec3(0,0,-1), 2.0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(3,0,0), vec3(-0.5,0,0)), // the ray is colinear with the line and it hits the line
+               true,
+               hit_record{ vec3(1,0,0), vec3(0,0,-1), 4.0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(6,0,0), vec3(42,0,0)), // the ray is colinear with the line but it misses the line
+               false,
+               none
+            );
+
+   test_line(l, 
+               ray(point3(-9,0,0), vec3(-6,0,0)), // the ray is colinear with the line but it misses the line
+               false,
+               none
+            );
+
+   test_line(l, 
+               ray(point3(4,6,10), vec3(2,5,9)), // the ray is outside the line and it points away from the line
+               false,
+               none
+            );
+
+   test_line(l, 
+               ray(point3(6,-2,-5), vec3(0,-42,0)), // the ray is outside the line and it points away from the line
+               false,
+               none
+            );
+
+   test_line(l, 
+               ray(point3(0,1,0), vec3(0.5,-0.5,0)), // the ray is outside the line and it hits the line
+               true,
+               hit_record{ vec3(1,0,0), vec3(0,1,0), 2.0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(0.5,-3,-3), vec3(0,1,1)), // the ray is outside the line and it hits the line
+               true,
+               hit_record{ vec3(0.5,0,0), normalize(vec3(0,-1,-1)), 3.0, false, empty}
+            );
+
+   test_line(l, 
+               ray(point3(0,6,0), vec3(-6,0,10)), // the ray is outside the line. It points towards the line but misses it
+               false,
+               none
+            );
+   
+   test_line(l, 
+               ray(point3(0,-2,-6), vec3(0,10,3)), // the ray is outside the line. It points towards the line but misses it
+               false,
+               none
+            );
 }

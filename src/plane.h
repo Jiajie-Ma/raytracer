@@ -11,7 +11,7 @@ public:
       std::shared_ptr<material> m) : a(p), n(normal), mat_ptr(m) {
          assert(glm::length(n) > 0 && "The normal vector of a plane cannot be 0!");
          // make sure the normal follows right hand rule, i.e. it always points left or outside the screen
-         if (n[1] < 0 || n[0] > 0 || n[2] < 0)
+         if (n[0] > 0 || n[1] < 0 || n[2] < 0)
          {
             n = -n;
          }

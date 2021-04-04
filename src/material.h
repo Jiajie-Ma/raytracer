@@ -68,12 +68,12 @@ public:
      // diffuse
      glm::vec3 unitn = normalize(rec.normal);
      glm::vec3 lightDir = normalize(lightPos - rec.p);
-     glm::color diffuse = kd * max(glm::vec3(0), glm::dot(unitn, lightDir)) * diffuseColor;
+     glm::color diffuse = kd * fmax(0.f, glm::dot(unitn, lightDir)) * diffuseColor;
 
      // specular
-     glm::vec3 reflection = normalize(-glm::reflect(lightDir, unitn));
+     glm::vec3 reflection = normalize(2 * glm::dot(lightDir, unitn) * unitn - lightDir);
      glm::vec3 unitv = normalize(viewPos - rec.p);
-     glm::color spec = ks * specColor * float(pow(glm::dot(unitv, reflection), shininess));
+     glm::color spec = ks * specColor * float(pow(fmax(0.f, glm::dot(unitv, reflection)), shininess));
 
      attenuation = ambient + diffuse + spec;
      return false;

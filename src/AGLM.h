@@ -114,3 +114,28 @@ inline bool near_zero(float x)
    return fabs(x) < s;
 }
 
+// given two parallel vectors u, v, find the scalar c such that u = cv
+inline float find_scalar(glm::vec3 u, glm::vec3 v)
+{
+   // check if u and v are indeed parallel
+   //assert(near_zero(glm::cross(u,v)) && "u and v are supposed to be parallel to find the scalar!");
+
+   float c;
+   if (v[0] != 0)
+   {
+      c = u[0]/v[0];
+   }
+   else if (v[1] != 0)
+   {
+      c = u[1]/v[1];
+   }
+   else if (v[2] != 0)
+   {
+      c = u[2]/v[2];
+   }
+   else{
+      c = 0;
+   }
+
+   return c;
+}

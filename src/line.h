@@ -7,18 +7,22 @@
 
 class line : public hittable {
 public:
-   line() : a(0), b(1,0,0), normal(0,1,0), mat_ptr(0) {}
+   line() : a(0), b(0,1,0), normal(-1,0,0), mat_ptr(0) {}
    line(const glm::point3& v0, const glm::point3& v1,
       std::shared_ptr<material> m) : a(v0), b(v1), mat_ptr(m) {
           // make sure the line is not degenerated as a point
-          assert(a == b && "The endpoints of a line cannot be the same!");
-          // let the normal be the cross product with (1,0,0). If the line is parallal with (1,0,0), let the normal be (0,1,0)
-          if (near_zero(glm::cross(b-a, glm::vec3(1,0,0))))
+          assert(a != b && "The endpoints of a line cannot be the same!");
+          // let the normal be the cross product with (0,1,0) so that it always points left (i.e. towards the hyperspace containing negative x axis)
+          if (near_zero(glm::cross(glm::vec3(0,1,0), b-a)))
           {
-              normal = glm::vec3(0,1,0);
+              normal = glm::vec3(-1,0,0);
           }
           else{
-              normal = glm::cross(b-a, glm::vec3(1,0,0));
+              normal = glm::cross(glm::vec3(0,1,0), b-a);
+              if (normal[0] > 0 || (near_zero(normal[0]) && normal[2] < 0))
+              {
+                  normal = -normal;
+              }
           }
       };
 
@@ -56,20 +60,21 @@ bool line::hit(const ray& r, hit_record& rec) const {
     if (near_zero(c1) && near_zero(n))
     {
         // check if the r.origin() is on ab
-        float u = v2[0]/v1[0];
-        if (0.0 <= u <= 1.0)
+        float u = find_scalar(v2, v1);
+        if (0.0 <= u && u <= 1.0)
         {
             // if so, let t = 0
             t = 0;
         }
         else{
             // otherwise, check if the ray hits either a or b
-            float t0 = -a[0]/r.direction()[0];
-            float t1 = -b[0]/r.direction()[0];
+            float t0 = find_scalar(a-r.origin(), r.direction());
+            float t1 = find_scalar(b-r.origin(), r.direction());
+            
 
-            if (0.0 <= t0 <= 1.0 || 0.0 <= t1 <= 1.0)
+            if (t0 >=0 || t1 >= 0)
             {
-                if (t0 < t1)
+                if ((t0 < t1 && t0 >= 0) || t1 < 0)
                 {
                     t = t0;
                 }
@@ -90,8 +95,8 @@ bool line::hit(const ray& r, hit_record& rec) const {
     else
     {
         // otherwise, r is not parallel with ab
-        float u = c2[0]/c1[0]; // (q-p)*s/r*s
-        t = n[0]/c1[0]; // (q-p)*r/r*s
+        float u = find_scalar(c2, c1); // (q-p)*s/r*s
+        t = find_scalar(n, c1); // (q-p)*r/r*s
 
         // check if r misses ab
         if (t < 0 || u < 0 || u > 1)
@@ -106,8 +111,13 @@ bool line::hit(const ray& r, hit_record& rec) const {
     rec.mat_ptr = mat_ptr; 
 
     // save normal
+    std::cout << normal << std::endl;
     glm::vec3 outward_normal = normalize(normal); // compute unit length normal
-    rec.set_face_normal(r, outward_normal);
+    if (t == 0)
+    {
+        n = glm::cross(r.origin() + r.direction() * 42.0f, v1);
+    }
+    rec.set_line_face_normal(r, outward_normal, n, v1);
 
     return true;
 }
