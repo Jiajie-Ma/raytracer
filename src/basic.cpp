@@ -259,5 +259,5 @@ void ray_trace(ppm_image& image)
       }
    }
 
-   image.save("basic.png");
+   image.save("basicblur.png");
 }
