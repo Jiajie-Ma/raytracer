@@ -54,14 +54,14 @@ raytracer/build $ ../bin/normals
 ![Room](results/room.png)
 
 
-*Triangle*: specified by three vertices $a$, $b$, $c$. Its outwards normal follows the right-hand rule and it always points left or outisde the screen. Example: Tetrahedron.png, Planet.png (the ring is made by drawing a collection of triangles).
+*Triangle*: specified by three vertices *a*, *b*, *c*. Its outwards normal follows the right-hand rule and it always points left or outisde the screen. Example: Tetrahedron.png, Planet.png (the ring is made by drawing a collection of triangles).
 
 ![Tetrahedron](results/tetrahedron.png)
 
 
 ### Custom primitives
 
-*Line segment*: specified by two endpoints $a$ and $b$. Its outwards normal always points left or outside the screen (by taking the cross product with *(0,0,1)*). This primitive cannot be captured in an image alone, but it contributes to other primitives such as triangles, etc.
+*Line segment*: specified by two endpoints *a* and *b*. Its outwards normal always points left or outside the screen (by taking the cross product with *(0,0,1)*). This primitive cannot be captured in an image alone, but it contributes to other primitives such as triangles, etc.
 
 *Circle*: specified by a center, a radius, and a normal. This is done by dividing a circle on xy-plane into pieces of triangles and applying the transformation matrices.
 
@@ -90,7 +90,7 @@ raytracer/build $ ../bin/normals
 
 *The Space Station Series*
 
-This series of images are produced by applying all supported features. The walls are made using plane primitive and phong material, except that the one in the center is made in glass/dieletric. The tetrahedron is made using triangle/line primitive(s) and metal material. The planets are made using sphere primitives and lambertian material. The ring is made by circle/triangle primitives and lambertian material. 
+This series of images are produced by applying all supported features. The background color is changed to (1, 5, 14) (the galaxy palette). The walls are made using plane primitive and phong material, except that the one in the center is made in glass/dieletric. The tetrahedron is made using triangle/line primitive(s) and metal material. The planets are made using sphere primitives and lambertian material. The ring is made by circle/triangle primitives and lambertian material. 
 
 ![The Space Station scene](results/basic.png)
 
