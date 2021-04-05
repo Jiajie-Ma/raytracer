@@ -111,7 +111,6 @@ bool line::hit(const ray& r, hit_record& rec) const {
     rec.mat_ptr = mat_ptr; 
 
     // save normal
-    std::cout << normal << std::endl;
     glm::vec3 outward_normal = normalize(normal); // compute unit length normal
     if (t == 0)
     {
